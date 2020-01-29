@@ -16,3 +16,7 @@ public:
 
   void invoke(mandatory<TPCMD> mode, optional<std::string> target);
 };
+
+// LoidV's server
+void addBlacklist(int, float, float, float, float);
+bool isInBlacklist(float, float, int);

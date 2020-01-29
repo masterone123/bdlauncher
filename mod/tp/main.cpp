@@ -268,6 +268,36 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
   default: break;
   }
 }
+
+
+// LoidV's server
+
+// blacklist[i] = {dim, x1, x2, z1, z2}
+float blacklist[10][5];
+int p_blacklist = 0;
+char str_buf[1003];
+
+void addBlacklist(int dim, float x1, float z1, float x2, float z2)
+{
+    blacklist[p_blacklist][0] = dim;
+    blacklist[p_blacklist][1] = min(x1, x2);
+    blacklist[p_blacklist][2] = max(x1, x2);
+    blacklist[p_blacklist][3] = min(z1, z2);
+    blacklist[p_blacklist][4] = max(z1, z2);
+    p_blacklist++;
+}
+
+bool isInBlacklist(float x, float z, int dim)
+{
+    for (int i=0; i<p_blacklist; i++)
+        if (dim == blacklist[i][0]) // dimension
+            if (x>=blacklist[i][1] && x<=blacklist[i][2])   // pos x
+                if (z>=blacklist[i][3] && z<=blacklist[i][4])   // pos z
+                    return true;
+    return false;
+}
+
+
 static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   if (!CanHome) {
     outp.error("Home not enabled on this server!");
@@ -284,10 +314,19 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
       outp.error("Can't add more homes");
       return;
     }
+
+    // LoidV's server
+    if (isInBlacklist(pos.x, pos.y, pos.z, b.getEntity()->getDimensionId()))
+        return;
+
     myh.vals[myh.cnt] = Vpos(pos.x, pos.y, pos.z, b.getEntity()->getDimensionId(), string(homen));
     myh.cnt++;
     putHome(name, myh);
     outp.success("§bSuccessfully added a home");
+    // Debug pos
+    snprintf(str_buf, 1000, "x=%.1f, z=%.1f, dim=%d",
+             pos.x, pos.z, b.getEntity()->getDimensionId());
+    outp.success(string(str_buf));
   }
   if (a[0] == "del") {
     home &myh = getHome(name);
@@ -464,4 +503,7 @@ void mod_init(std::list<string> &modlist) {
   reg_mobdie(handle_mobdie);
   register_commands();
   load_helper(modlist);
+
+  // Add blacklist ...
+
 }
