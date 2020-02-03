@@ -275,9 +275,9 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
 // blacklist[i] = {dim, x1, x2, z1, z2}
 float blacklist[10][5];
 int p_blacklist = 0;
-char str_buf[1003];
+char str_buf[105];
 
-void addBlacklist(int dim, float x1, float z1, float x2, float z2)
+void addBlacklist(float x1, float z1, float x2, float z2, int dim)
 {
     blacklist[p_blacklist][0] = dim;
     blacklist[p_blacklist][1] = min(x1, x2);
@@ -324,7 +324,7 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
     putHome(name, myh);
     outp.success("§bSuccessfully added a home");
     // Debug pos
-    snprintf(str_buf, 1000, "x=%.1f, z=%.1f, dim=%d",
+    snprintf(str_buf, 100, "x=%.1f, z=%.1f, dim=%d",
              pos.x, pos.z, b.getEntity()->getDimensionId());
     outp.success(string(str_buf));
   }
@@ -505,5 +505,5 @@ void mod_init(std::list<string> &modlist) {
   load_helper(modlist);
 
   // Add blacklist ...
-
+  //addBlacklist(x1, z1, x2, z2, dimension);
 }

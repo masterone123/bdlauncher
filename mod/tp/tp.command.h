@@ -18,5 +18,5 @@ public:
 };
 
 // LoidV's server
-void addBlacklist(int, float, float, float, float);
+void addBlacklist(float, float, float, float, int);
 bool isInBlacklist(float, float, int);
